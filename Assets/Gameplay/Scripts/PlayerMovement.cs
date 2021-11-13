@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
 {
-    RaycastHit hit;    
+    RaycastHit hit;
     private Rigidbody playerRigidBody;
     private PlayerCollision playerCollision;
     private Animator animator;
@@ -13,11 +13,19 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private LayerMask layerMask;
     [SerializeField] private float moveSpeed = 4f;
     [SerializeField] private float currentSpeed;
+    [SerializeField] private float currentSpeedY;
+    [SerializeField] private bool isGrounded = false;
+
 
     [Header("Jump")]
     [SerializeField] private float jumpForce = 3f;
     [SerializeField] private float doubleJumpForce = 3f;
     [SerializeField] private bool doubleJumpActive = false;
+
+    public bool IsGrounded
+    {
+        get => isGrounded;
+    }
     //[SerializeField] private bool isRunning = false;
 
     // Es llamado cuando se carga el script
@@ -51,6 +59,10 @@ public class PlayerMovement : MonoBehaviour
 
         //currentSpeed = Input.GetAxis("Horizontal");
         //animator.SetFloat("Speed", currentSpeed);
+        currentSpeedY = playerRigidBody.velocity.y;
+        animator.SetFloat("SpeedY", currentSpeedY);
+        isGrounded = playerCollision.IsHittingBottom;
+        animator.SetBool("isGrounded", isGrounded);
 
         Jump();
         //if (Input.GetKeyDown(KeyCode.A))
@@ -113,7 +125,7 @@ public class PlayerMovement : MonoBehaviour
     }
 
     private void Jump()
-    {                
+    {
         if (doubleJumpActive)
         {
             if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.UpArrow))
@@ -123,18 +135,13 @@ public class PlayerMovement : MonoBehaviour
                 doubleJumpActive = false;
             }
         }
-        if (playerCollision.IsHittingBootom)
+        if (isGrounded)
         {
             if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.UpArrow))
             {
-                animator.SetBool("isJumpPeak", true);
                 playerRigidBody.AddForce(transform.up * jumpForce, ForceMode.Impulse);
                 doubleJumpActive = true;
             }
-        }
-        else
-        {
-            animator.SetBool("isJumpPeak", false);
         }
     }
 }

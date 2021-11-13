@@ -6,12 +6,12 @@ public class PlayerCollision : MonoBehaviour
 {
     RaycastHit hit;
     [SerializeField] private LayerMask layerMask;
-    [SerializeField] private bool isHittingBootom;
+    [SerializeField] private bool isHittingBottom;
     [SerializeField] private bool isHittingForward;
     [SerializeField] private float rayForwardDistance = 1f;
     [SerializeField] private float rayDownDistance = 0.2f;
 
-    public bool IsHittingBootom { get => isHittingBootom; set => isHittingBootom = value; }
+    public bool IsHittingBottom { get => isHittingBottom; set => isHittingBottom = value; }
     public bool IsHittingForward { get => isHittingForward; set => isHittingForward = value; }
 
     // Se actualiza cada x tiempo, se usa para cálculos de físicas
@@ -31,11 +31,11 @@ public class PlayerCollision : MonoBehaviour
         {
             Debug.DrawRay(transform.position, -transform.up * hit.distance, Color.yellow);
             Debug.Log(hit.collider.gameObject);
-            IsHittingBootom = true;
+            IsHittingBottom = true;
         }
         else
         {
-            IsHittingBootom = false;
+            IsHittingBottom = false;
         }
     }
 }
