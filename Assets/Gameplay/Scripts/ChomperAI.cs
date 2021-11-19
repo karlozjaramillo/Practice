@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -10,6 +11,9 @@ public class ChomperAI : MonoBehaviour
     [SerializeField] private Transform currentPoint;
     [SerializeField] private Transform wayPointOne;
     [SerializeField] private Transform wayPointTwo;
+    [SerializeField] private bool targetDetected = false;
+    [SerializeField] private Transform target;
+
 
     private void Awake()
     {
@@ -22,20 +26,50 @@ public class ChomperAI : MonoBehaviour
         navMeshAgent.SetDestination(currentPoint.position);
     }
 
+    private void OnTriggerEnter(Collider collider)
+    {
+        if (collider.CompareTag("Player"))
+        {
+            targetDetected = true;
+            target = collider.gameObject.transform;
+        }
+    }
+
+    private void OnTriggerExit(Collider collider)
+    {
+        if (collider.CompareTag("Player"))
+        {
+            targetDetected = false;
+            target = collider.transform;
+        }
+    }
+
     private void Update()
     {
-        if (AgentDone())
+        if (!targetDetected)
         {
-            if (currentPoint == wayPointOne)
+            animator.SetBool("TargetDetected", false);
+            navMeshAgent.speed = 1F;
+            if (AgentDone())
             {
-                currentPoint = wayPointTwo;
-                navMeshAgent.SetDestination(currentPoint.position);
+                if (currentPoint == wayPointOne)
+                {
+                    currentPoint = wayPointTwo;
+                    navMeshAgent.SetDestination(currentPoint.position);
+                }
+                else
+                {
+                    currentPoint = wayPointOne;
+                    navMeshAgent.SetDestination(currentPoint.position);
+                }
             }
-            else
-            {
-                currentPoint = wayPointOne;
-                navMeshAgent.SetDestination(currentPoint.position);
-            }
+        }
+        else
+        {
+            currentPoint = target;
+            animator.SetBool("TargetDetected", true);
+            navMeshAgent.speed = 3.5F;
+            navMeshAgent.SetDestination(currentPoint.position);
         }
 
         animator.SetFloat("Speed", navMeshAgent.speed);
